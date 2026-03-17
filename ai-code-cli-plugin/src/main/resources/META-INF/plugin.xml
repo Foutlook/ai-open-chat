@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>com.foutlook.aicliintegration</id>
+    <name>AI Code CLI Integration</name>
+    <vendor email="support@example.com" url="https://github.com/foutlook/ai-open-chat">
+        Foutlook
+    </vendor>
+
+    <description><![CDATA[
+    An IntelliJ IDEA plugin that integrates with local AI code generation CLIs (OpenCode, Codex, Claude Code).
+    Features:
+    - Real-time code modification display from CLI tools
+    - Bidirectional guidance between IDE and CLI
+    - Support for multiple CLI backends
+    - Diff view and one-click apply changes
+    ]]>
+    </description>
+
+    <!-- Minimum and maximum supported IDE versions -->
+    <idea-version since-build="232.0"/>
+
+    <!-- Declare that the plugin is compatible with IntelliJ IDEA -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <actions>
+        <group id="AICliIntegration.MainMenu" text="AI CLI Integration" description="AI Code CLI Integration Tools">
+            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="CodeMenu"/>
+            <separator/>
+            <!-- 多实例管理菜单 -->
+            <action id="AICliIntegration.StartInstanceAction" class="com.foutlook.aicliintegration.action.StartCliInstanceAction" text="Start CLI Instance" description="Start a new CLI instance" keyboard-shortcut="ctrl shift alt S"/>
+            <action id="AICliIntegration.StopInstanceAction" class="com.foutlook.aicliintegration.action.StopCliInstanceAction" text="Stop CLI Instance" description="Stop an active CLI instance"/>
+            <action id="AICliIntegration.OpenInstancesPanelAction" class="com.foutlook.aicliintegration.action.OpenCliInstancesPanel" text="Open CLI Instances" description="Open CLI Instances panel" keyboard-shortcut="ctrl shift alt O"/>
+            <action id="AICliIntegration.SendFileAction" class="com.foutlook.aicliintegration.action.SendFileToCliInstanceAction" text="Send File to CLI" description="Send current file to selected CLI instance" keyboard-shortcut="ctrl shift alt F"/>
+            <separator/>
+            <!-- 旧版本 (已弃用) -->
+            <action id="AICliIntegration.ConfigureAction" class="com.foutlook.aicliintegration.action.ConfigureCliAction" text="Configure CLI (Legacy)" description="Configure AI CLI settings [Deprecated]"/>
+        </group>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- 新的多实例工具窗口 -->
+        <toolWindow id="AICliInstances" anchor="bottom" class="com.foutlook.aicliintegration.ui.CliInstancesToolWindowFactory" factoryClass="com.foutlook.aicliintegration.ui.CliInstancesToolWindowFactory"/>
+        
+        <!-- 旧的工具窗口 (已弃用) -->
+        <toolWindow id="AICliIntegration" anchor="bottom" class="com.foutlook.aicliintegration.ui.CliToolWindowFactory" factoryClass="com.foutlook.aicliintegration.ui.CliToolWindowFactory" secondary="true"/>
+        
+        <!-- 设置页面 -->
+        <projectConfigurable parentId="tools" instance="com.foutlook.aicliintegration.settings.CliConfigurable" id="com.foutlook.aicliintegration.settings" displayName="AI CLI Integration"/>
+        
+        <!-- 项目服务 -->
+        <projectService serviceImplementation="com.foutlook.aicliintegration.service.CliConnectionService"/>
+        <projectService serviceImplementation="com.foutlook.aicliintegration.service.CodeSyncService"/>
+        <projectService serviceImplementation="com.foutlook.aicliintegration.service.CliInstanceManagerService"/>
+        <projectService serviceImplementation="com.foutlook.aicliintegration.settings.CliSettings"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="com.foutlook.aicliintegration.listener.DocumentChangeListener" topic="com.intellij.openapi.editor.event.DocumentListener"/>
+    </applicationListeners>
+</idea-plugin>
